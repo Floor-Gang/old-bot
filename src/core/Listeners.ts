@@ -5,6 +5,13 @@ import { Bot } from "./Bot";
 import { PossibleMessage } from "./models/Shared";
 
 
+/**
+ * All event channels are managed here. Each event channel name has a
+ * method prefixed with "on" as an example the "message" callback method is
+ * called "onMessage". If there is an event channel missing free to add it
+ * by assigned a listener in the start method and creating a separate
+ * method that handles the given event channel.
+ */
 export class Listeners {
   private readonly preprocessors = preprocessors;
   private readonly commands = commands;
@@ -16,6 +23,9 @@ export class Listeners {
     this.help = null;
   }
 
+  /**
+   * This creates all the event channel listeners.
+   */
   public start() {
     const client = this.bot.getClient();
 
@@ -27,16 +37,28 @@ export class Listeners {
     client.on('ready', this.onReady.bind(this));
   }
 
+  /**
+   * Discord client "ready" event channel callback method
+   * @link https://discord.js.org/#/docs/main/stable/class/Client?scrollTo=e-ready
+   */
   private onReady() {
     const client = this.bot.getClient();
     console.log(`Ready as ${client?.user?.username}`);
   }
 
+  /**
+   * Discord client "messageUpdate" event channel callback method
+   * @link https://discord.js.org/#/docs/main/stable/class/Client?scrollTo=e-messageUpdate
+   */
   private async onMessageUpdate(_: PossibleMessage, updated: PossibleMessage) {
     if (updated instanceof Message)
       await this.process<Message>('message', updated);
   }
 
+  /**
+   * Discord client "message" event channel callback method
+   * @link https://discord.js.org/#/docs/main/stable/class/Client?scrollTo=e-message
+   */
   private async onMessage(message: Message) {
     const msg = await this.process<Message>('message', message);
     if (msg == null)
@@ -56,13 +78,16 @@ export class Listeners {
     }
   }
 
+  /**
+   * This returns the list of commands and their description if they have one.
+   */
   private getHelp(): string {
     if (this.help != null)
       return this.help;
 
     let help = "**Available Commands**\n";
     for (const command of this.commands) {
-      help += ` **${this.prefix} ${command.name}** ${command.description}\n`;
+      help += ` **${this.prefix} ${command.name}** ${command.description || ''}\n`;
     }
 
     this.help = help;
@@ -70,6 +95,13 @@ export class Listeners {
     return help;
   }
 
+  /**
+   * After passing through the onMessage method if the message is trying to
+   * reach the bot's commands it is then emitted here.
+   * @param {string} name Command name being called
+   * @param {Message} msg Message to respond to
+   * @returns {Promise<boolean>}
+   */
   private async onCommand(name: string, msg: Message): Promise<boolean> {
     for (const command of this.commands) {
       if (command.name == name) {
@@ -80,6 +112,13 @@ export class Listeners {
     return false;
   }
 
+  /**
+   * This communicates with preprocessors
+   * @param {string} name Event channel name
+   * @param {any[]} obj Rest parameters reserved for what a given event
+   * channel provides
+   * @returns {Promise<T | null>}
+   */
   private async process<T>(name: string, ...obj: any[]): Promise<T | null> {
     let result: any | null = null;
 
