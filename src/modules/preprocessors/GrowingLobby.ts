@@ -88,8 +88,9 @@ export class GrowingLobby implements Preprocessor<VoiceState> {
   }
 
   private async newChild(category: CategoryChannel) {
+    const count = (await this.getChildren(category)).length;
     const channel = await category.guild.channels.create(
-      `Gaming ${this.children.length + 4}`,
+      `Gaming ${count + 4}`,
       { type: 'voice' }
     );
 

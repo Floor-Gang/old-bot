@@ -5,27 +5,24 @@ import { Bot } from "../../core/Bot";
 
 export class GameChanger implements Preprocessor<VoiceState> {
   public readonly name = "voiceStateUpdate";
-  private readonly whitelist: string[] = [
-    "718553303167926333",
-    "720121442594848849",
-    "720121552967827488",
-  ];
+  private readonly parentID: string = "718627690202005555";
   private changes: Map<string, string> = new Map();
 
   public async process(bot: Bot, obj: VoiceState[]): Promise<VoiceState | null> {
     const old = obj[0];
     const updated = obj[1];
-    const channel = old.channel || updated.channel;
+    const channel = updated.channel || old.channel;
 
-    if (channel) {
-      if (!this.whitelist.includes(channel.id))
-        return obj[0];
-
+    if (channel && channel.parent && channel.parent.id == this.parentID) {
       const mostPlayed = GameChanger.calculate(channel);
 
       if (mostPlayed) {
+        console.log(
+          `This is the most played game in "${channel.name}", "${mostPlayed.name}"`
+        );
+
         this.changes.set(channel.id, channel.name);
-        await channel.setName(mostPlayed.name);
+        await channel.edit({name: mostPlayed.name});
       } else {
         const oldName = this.changes.get(channel.id);
 
