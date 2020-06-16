@@ -7,10 +7,17 @@
     "start": "tsc && node ./dist/app.js"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^5.4.0",
+    "@types/mkdirp": "^1.0.1",
     "@types/node": "^14.0.13",
+    "@types/uuid": "^8.0.0",
     "typescript": "^3.9.5"
   },
   "dependencies": {
-    "discord.js": "^12.2.0"
+    "better-sqlite3": "^7.1.0",
+    "discord.js": "^12.2.0",
+    "mkdirp": "^1.0.4",
+    "uuid": "^8.1.0",
+    "yaml": "^1.10.0"
   }
 }

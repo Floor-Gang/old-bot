@@ -1,8 +1,9 @@
-import { Message } from "discord.js";
+import { Message, VoiceState } from "discord.js";
 import { preprocessors } from "../modules/preprocessors";
 import { commands } from "../modules/commands";
 import { Bot } from "./Bot";
 import { PossibleMessage } from "./models/Shared";
+import { v1 as uuid } from "uuid";
 
 
 /**
@@ -32,9 +33,11 @@ export class Listeners {
     // Messages
     client.on('message', this.onMessage.bind(this));
     client.on('messageUpdate', this.onMessageUpdate.bind(this));
+    client.on('voiceStateUpdate', this.onVoiceStateUpdate.bind(this));
 
     // Client
     client.on('ready', this.onReady.bind(this));
+    client.on('error', console.error);
   }
 
   /**
@@ -53,6 +56,14 @@ export class Listeners {
   private async onMessageUpdate(_: PossibleMessage, updated: PossibleMessage) {
     if (updated instanceof Message)
       await this.process<Message>('message', updated);
+  }
+
+  /**
+   * Discord client "messageUpdate" event channel callback method
+   * @link https://discord.js.org/#/docs/main/stable/class/Client?scrollTo=e-messageUpdate
+   */
+  private async onVoiceStateUpdate(old: VoiceState, updated: VoiceState) {
+    await this.process<VoiceState>('voiceStateUpdate', old, updated);
   }
 
   /**
@@ -105,7 +116,23 @@ export class Listeners {
   private async onCommand(name: string, msg: Message): Promise<boolean> {
     for (const command of this.commands) {
       if (command.name == name) {
-        await command.handle(this.bot, msg);
+        const id = uuid();
+        console.log(
+          `[${id}] Command Executed\n` +
+          ` - User: ${msg.author.username}#${msg.author.discriminator}\n` +
+          ` - Command: ${msg.content}`
+        );
+        try {
+          await command.handle(this.bot, msg);
+        } catch (err) {
+          console.error(
+            `[${id}] Command Error\n` +
+            ` - User: ${msg.author.username}#${msg.author.discriminator}\n` +
+            ` - Command: ${msg.content}\n` +
+            ` - Error:`, err
+          );
+        }
+
         return true;
       }
     }
@@ -124,9 +151,19 @@ export class Listeners {
 
     for (const preprocessor of this.preprocessors) {
       if (name == preprocessor.name) {
-        result = await preprocessor.process(this.bot, obj);
-        if (result == null)
-          break;
+        const id = uuid();
+        try {
+          result = await preprocessor.process(this.bot, obj);
+          if (result == null)
+            break;
+        } catch (err) {
+          console.error(
+            `[${id}] Preprocessor Error\n` +
+            ` - Event Name: ${name}\n` +
+            ` - Error:`, err
+          );
+        }
+
       }
     }
     return result;

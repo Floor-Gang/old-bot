@@ -1,21 +1,13 @@
 import { Bot } from "./core/Bot";
 
 
-const config = {
-  bot: {
-    prefix: '!pewds'
-  }
-}
-
 async function main() {
   try {
-    const bot = new Bot(config.bot);
-    const token = process.env['TOKEN'];
+    const bot = new Bot();
 
-    await bot.start(token || '');
+    await bot.start();
   } catch (err) {
-    console.log("Something went wrong while logging in, was a proper token" +
-                " provided?");
+    console.log(err);
   }
 }
 
