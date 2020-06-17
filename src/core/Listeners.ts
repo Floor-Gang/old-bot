@@ -1,8 +1,7 @@
-import { Message, VoiceState } from "discord.js";
+import { Message, PartialMessage, VoiceState } from "discord.js";
 import { preprocessors } from "../modules/preprocessors";
 import { commands } from "../modules/commands";
 import { Bot } from "./Bot";
-import { PossibleMessage } from "./models/Shared";
 import { v1 as uuid } from "uuid";
 
 
@@ -53,7 +52,7 @@ export class Listeners {
    * Discord client "messageUpdate" event channel callback method
    * @link https://discord.js.org/#/docs/main/stable/class/Client?scrollTo=e-messageUpdate
    */
-  private async onMessageUpdate(_: PossibleMessage, updated: PossibleMessage) {
+  private async onMessageUpdate(_: any, updated: Message | PartialMessage) {
     if (updated instanceof Message)
       await this.process<Message>('message', updated);
   }
