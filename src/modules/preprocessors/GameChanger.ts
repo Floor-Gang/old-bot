@@ -40,11 +40,16 @@ export class GameChanger implements Preprocessor<VoiceState> {
     return obj[0];
   }
 
+  /**
+   * This finds the most played game of a given channel, if there are no
+   * games it will return null
+   * @param channel Channel to review
+   */
   private static calculate(channel: VoiceChannel): Activity | null {
     let games: [number, Activity][] = [];
     let mostPlayed: [number, Activity] | null = null;
 
-    // Get all the games being plaid
+    // Get all the games being played
     for (const member of channel.members.values()) {
       const game = member.presence.activities.find(x => x.type == "PLAYING");
 
@@ -63,6 +68,7 @@ export class GameChanger implements Preprocessor<VoiceState> {
       }
     }
 
+    // Now find the most played game
     for (const [playing, game] of games) {
       if (!mostPlayed)
         mostPlayed = [playing, game];
