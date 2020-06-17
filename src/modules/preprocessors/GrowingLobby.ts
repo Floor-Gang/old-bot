@@ -3,6 +3,11 @@ import { CategoryChannel, VoiceChannel, VoiceState } from "discord.js";
 import { Bot } from "../../core/Bot";
 
 
+/**
+ * This preprocessor will will create new voice channels when all the
+ * gaming lobbies are full. When the gaming lobbies are empty the newly
+ * created channels are deleted.
+ */
 export class GrowingLobby implements Preprocessor<VoiceState> {
   public readonly name = "voiceStateUpdate";
   private readonly whitelist: string[] = [

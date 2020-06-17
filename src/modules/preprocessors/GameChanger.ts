@@ -3,6 +3,12 @@ import { Activity, VoiceChannel, VoiceState } from "discord.js";
 import { Bot } from "../../core/Bot";
 
 
+/**
+ * @deprecated Discord made an update to the timeout for setting a
+ * channel's name which breaks this feature. DO NOT USE
+ *
+ * This will update a voice channel based on the game being played in it.
+ */
 export class GameChanger implements Preprocessor<VoiceState> {
   public readonly name = "voiceStateUpdate";
   private readonly parentID: string = "718627690202005555";

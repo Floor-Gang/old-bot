@@ -4,6 +4,9 @@ import { Bot } from "../../core/Bot";
 import { Roles } from "../../util/Roles";
 
 
+/**
+ * This command will show who has a given role or not
+ */
 export class Who implements Command {
   public readonly name = 'who';
   public readonly description = 'For listen who has a certain role. For' +
