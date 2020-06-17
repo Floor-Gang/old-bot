@@ -63,7 +63,7 @@ export class GrowingLobby implements Preprocessor<VoiceState> {
     const isFull = GrowingLobby.isFull(...children);
 
     if (isFull) {
-      await this.newChild(category);
+      await GrowingLobby.newChild(category, children);
     }
   }
 
@@ -87,8 +87,8 @@ export class GrowingLobby implements Preprocessor<VoiceState> {
     return result;
   }
 
-  private async newChild(category: CategoryChannel) {
-    const count = (await this.getChildren(category)).length;
+  private static async newChild(category: CategoryChannel, children: VoiceChannel[]) {
+    const count = children.length;
     const channel = await category.guild.channels.create(
       `Gaming ${count + 4}`,
       { type: 'voice' }
