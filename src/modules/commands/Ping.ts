@@ -11,6 +11,9 @@ export class Ping implements Command {
   public readonly description = "For testing";
 
   public async handle(bot: Bot, msg: Message): Promise<void> {
-    await msg.reply('Pong');
+    const message = await msg.reply('Pong');
+    await message.edit(
+      `Pong ${message.createdTimestamp - msg.createdTimestamp}ms`
+    );
   }
 }
