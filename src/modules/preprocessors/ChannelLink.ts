@@ -7,24 +7,14 @@ import {
 import { Bot } from "../../core/Bot";
 
 
-type Linked = {
-  [key: string]: string
-}
-
 export class ChannelLink implements Preprocessor<VoiceState> {
-  private static readonly linked: Linked = {
-    "718433475828645933": "722231096078631034",
-    "718548936649998417": "722236118149365860",
-    "718550846563942463": "722236425357099029",
-    "718550967221485568": "722236508718759986"
-  }
   public readonly name = "voiceStateUpdate";
 
   public async process(bot: Bot, obj: VoiceState[]): Promise<VoiceState | null> {
     const old = obj[0];
     const update = obj[1];
     const channelA = update.channel || old.channel;
-    const linked = ChannelLink.linked[channelA ? channelA.id : ''];
+    const linked = ChannelLink.getLinked(bot, channelA ? channelA.id : '');
 
     if (linked) {
       const client = bot.getClient();
@@ -33,10 +23,15 @@ export class ChannelLink implements Preprocessor<VoiceState> {
       if (channelA && channelB) {
         await ChannelLink.sync(channelA, channelB as TextChannel);
       }
-
     }
 
     return update;
+  }
+
+  private static getLinked(bot: Bot, voiceChannelID: string): string | null {
+    const channels = bot.store.channelLink;
+
+    return channels.getLink(voiceChannelID);
   }
 
   private static async sync(channelA: VoiceChannel, channelB: TextChannel) {

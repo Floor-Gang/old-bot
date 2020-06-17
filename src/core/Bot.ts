@@ -9,14 +9,14 @@ import { Store } from "./Store";
 
 
 /**
- * This is the Bot class, it interfaces with Discord all event channels are
+ * This is the Bot class, it interfaces with Discord all event tags are
  * listened for in the Listeners class.
  */
 export class Bot {
   private static readonly characterLimit = 2000;
   private readonly client: Client;
   private readonly listeners: Listeners;
-  private readonly store: Store;
+  public readonly store: Store;
   private config: Config;
 
   constructor() {

@@ -5,13 +5,13 @@ import { Database } from "better-sqlite3";
 /**
  * This is for storing channel ID's and assigning them to a tag / name.
  */
-export class ChannelTable extends Table {
+export class TagTable extends Table {
   constructor(db: Database) {
     super(db, "channels");
     this.init();
   }
 
-  public setChannel(tag: string, channelID: string): boolean {
+  public setTag(tag: string, channelID: string): boolean {
     const info = this.db.prepare(
       `INSERT INTO ${this.tableName} (tag,channel_id) VALUES (?,?)`
     ).run(tag, channelID);
@@ -19,7 +19,7 @@ export class ChannelTable extends Table {
     return (info.changes > 0);
   }
 
-  public getChannel(tag: string): string | null {
+  public getTag(tag: string): string | null {
     const row = this.db.prepare(
       `SELECT channel_id FROM ${this.tableName} WHERE tag=?`
     ).get(tag);
@@ -34,8 +34,8 @@ export class ChannelTable extends Table {
   private init() {
     this.db.prepare(
       `CREATE TABLE IF NOT EXISTS ${this.tableName} (` +
-      `channel_id text NOT NULL,` +
-      `tag text PRIMARY KEY NOT NULL)`
+      `id text NOT NULL,` +
+      `tag text NOT NULL)`
     ).run();
   }
 }

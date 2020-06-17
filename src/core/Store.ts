@@ -1,5 +1,6 @@
 import sql from 'better-sqlite3';
-import { ChannelTable } from "./tables/ChannelTable";
+import { TagTable } from "./tables/TagTable";
+import { ChannelLink } from "./tables/ChannelLink";
 
 
 /**
@@ -8,11 +9,13 @@ import { ChannelTable } from "./tables/ChannelTable";
  */
 export class Store {
   private readonly db: sql.Database;
-  public readonly channels: ChannelTable
+  public readonly tags: TagTable;
+  public readonly channelLink: ChannelLink;
 
   constructor() {
     this.db = sql('pewds_bot.db');
-    this.channels = new ChannelTable(this.db);
+    this.tags = new TagTable(this.db);
+    this.channelLink = new ChannelLink(this.db);
   }
 
 }
