@@ -1,6 +1,7 @@
 import { Table } from "./Table";
 import { Database } from "better-sqlite3";
 
+
 export class ChannelLink extends Table {
   constructor(db: Database) {
     super(db, "channel_link");

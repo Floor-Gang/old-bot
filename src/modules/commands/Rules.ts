@@ -1,6 +1,6 @@
 import { Command } from "../../core/models/Command";
 import { Bot } from "../../core/Bot";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, MessageEmbed, TextChannel } from "discord.js";
 import { Roles } from "../../util/Roles";
 
 
@@ -9,14 +9,106 @@ import { Roles } from "../../util/Roles";
  * !pewds rules
  */
 export class Rules implements Command {
+  private static readonly tag = 'rules-channel';
   public readonly name = "rules";
   public readonly description = "Display the rules";
 
   @Roles.isAdmin()
   public async handle(bot: Bot, msg: Message): Promise<void> {
+    // args = [prefix, rules, command]
+    const args = msg.content.split(' ');
+
+    switch (args[2]) {
+      case 'set':
+        await Rules.set(bot, msg);
+        break;
+      case 'update':
+        await Rules.update(bot, msg);
+        break;
+      case 'test':
+        await Rules.post(msg.channel as TextChannel);
+        break;
+      default:
+        await Rules.help(bot, msg);
+        break;
+    }
+  }
+
+  private static async set(bot: Bot, msg: Message) {
+    const store = bot.store.channels;
+    const channel = msg.mentions.channels.first();
+
+    if (!channel) {
+      await msg.reply(
+        "Please mention the channel you'd like to set." +
+        ` \`${bot.getConfig().bot.prefix} rules set #channel-name\``
+      );
+      return;
+    }
+
+    const alreadyStored = store.hasChannel(channel, Rules.tag);
+
+    if (alreadyStored) {
+      await msg.reply("There is already ");
+      return;
+    }
+
+    try {
+      store.addChannel(channel, Rules.tag);
+      await msg.reply("Set rules channel.");
+    } catch (err) {
+      store.updateChannel(channel, Rules.tag);
+      await msg.reply("Set rules channel.");
+    }
+  }
+
+  private static async update(bot: Bot, msg: Message): Promise<void> {
+    if (!msg.guild)
+      return;
+
+    const store = bot.store.channels;
+    const channelID = store.getChannel(msg.guild.id, Rules.tag);
+
+    if (channelID) {
+      const client = bot.getClient();
+      const channel = await client.channels.fetch(channelID);
+
+      if (channel && channel.type == 'text') {
+        const txt = channel as TextChannel
+        await Rules.clearChannel(txt);
+        await Rules.post(txt);
+      } else {
+        await msg.reply("Can't find that channel")
+      }
+
+    } else {
+      await msg.reply("A rules channel isn't set.");
+    }
+  }
+
+  private static async clearChannel(channel: TextChannel): Promise<void> {
+    const messages = await channel.messages.fetch({ limit: 100 });
+
+    for (const message of messages.values()) {
+      await message.delete();
+    }
+  }
+
+  private static async help(bot: Bot, msg: Message) {
+    const prefix = bot.getConfig().bot.prefix;
+    await msg.reply(
+      `Rules Commands\n` +
+      ` - ${prefix} rules update This will update the rules channel\n` +
+      ` - ${prefix} rules set #channel-name This will set the rules channel\n` +
+      ` - ${prefix} rules test This will display the rules in this channel`
+    );
+  }
+
+
+  private static async post(channel: TextChannel): Promise<void> {
     for (const rule of rules) {
       const embed = new MessageEmbed(rule);
-      await msg.channel.send({ embed });
+      await channel.send({ embed });
     }
   }
 }
@@ -46,7 +138,11 @@ const rules = [
         },
         {
           "name": "4. Behave nicely",
-          "value": "There is zero tolerance for drama, racism, hate speech, or hatred towards any user."
+          "value": "There is zero tolerance for drama, racism, hate speech," +
+                   " or hatred towards any user. The use of the N-word, no" +
+                   " matter the spelling, is punishable in any context." +
+                   " Using the N-word with the \"hard r\" leads to a" +
+                   " permanent ban from the server."
         },
         {
           "name": "5. English only",
@@ -161,4 +257,4 @@ const rules = [
       "description": "\nThe Discord Terms of Service will be strictly enforced here. Discord community guidelines can be found at https://discord.com/guidelines and terms of service at https://discordapp.com/terms. Violation of these would result in a mute / temporary ban or even a permanent ban depending on the severity of the violation.\nBreaking the rules will have consequences. You paying for your youtube membership does not mean you can do whatever you want on this server.\nIgnorance/not reading these rules does not make you immune to them. Staff are all volunteers and may moderate at their discretion.\n",
       "color": 16712194
     }
-  ]
+];
