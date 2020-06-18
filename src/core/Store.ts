@@ -17,5 +17,4 @@ export class Store {
     this.tags = new TagTable(this.db);
     this.channelLink = new ChannelLink(this.db);
   }
-
 }

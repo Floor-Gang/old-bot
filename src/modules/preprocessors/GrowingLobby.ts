@@ -1,6 +1,7 @@
 import { Preprocessor } from "../../core/models/Preprocessor";
 import { CategoryChannel, VoiceChannel, VoiceState } from "discord.js";
 import { Bot } from "../../core/Bot";
+import { Flux } from "../commands/Flux";
 
 
 /**
@@ -10,70 +11,53 @@ import { Bot } from "../../core/Bot";
  */
 export class GrowingLobby implements Preprocessor<VoiceState> {
   public readonly name = "voiceStateUpdate";
-  private readonly whitelist: string[] = [
-    "722574493809377370",
-    "722555211511627817",
-    "722555282210684948"
-  ];
 
   public async process(bot: Bot, obj: VoiceState[]): Promise<VoiceState | null> {
-    const client = bot.getClient();
+    const store = bot.store.tags;
     const old = obj[0];
     const updated = obj[1];
     let channel: VoiceChannel | undefined;
-
-
-    if (old.channel && this.whitelist.includes(old.channel.id)){
+    if (old.channel){
       channel = old.channel;
-    } else if (updated.channel && this.whitelist.includes(updated.channel.id)) {
+    } else if (updated.channel) {
       channel = updated.channel;
     }
-    if (!channel)
+    if (!channel) {
+      return obj[1];
+    }
+    const category = channel.parent;
+    if (!category)
       return obj[1];
 
-    const channelOne = await client.channels.fetch(this.whitelist[0]);
-    const channelTwo = await client.channels.fetch(this.whitelist[1]);
-    const channelThree = await client.channels.fetch(this.whitelist[2]);
+    const isFluxCategory = store.has(Flux.category, category.id);
 
-    if (channelOne.type != 'voice')
-      throw new Error(`Lobby one "${this.whitelist[0]}" is not a voice channel`);
-    if (channelTwo.type != 'voice')
-      throw new Error(`Lobby two "${this.whitelist[1]}" is not a voice channel`);
-    if (channelThree.type != 'voice')
-      throw new Error(`Lobby three "${this.whitelist[2]}" is not a voice channel.`);
+    if (!isFluxCategory)
+      return obj[1];
 
-    const lobbyOne = channelOne as VoiceChannel;
-    const lobbyTwo = channelTwo as VoiceChannel;
-    const lobbyThree = channelThree as VoiceChannel;
-    const areFull = GrowingLobby.isFull(lobbyOne, lobbyTwo, lobbyThree);
+    const parents = GrowingLobby.getParents(bot, category);
+    const areFull = GrowingLobby.isFull(...parents);
 
     // If the main lobbies are full let's see if the child channels are full
     if (areFull) {
-      if (lobbyOne.parent)
-        await this.addMoreChildren(lobbyOne.parent);
-      else
-        throw new Error(`Lobby one "${this.whitelist[0]}" isn't in a category`);
+      await GrowingLobby.addMoreChildren(category, parents);
     } else {
-      if (lobbyOne.parent)
-        await this.checkEmptyChildren(lobbyOne.parent);
-      else
-        throw new Error(`Lobby one "${this.whitelist[0]}" isn't in a category`);
+      await GrowingLobby.checkEmptyChildren(category, parents);
     }
 
     return obj[0];
   }
 
-  private async addMoreChildren(category: CategoryChannel) {
-    const children = await this.getChildren(category);
+  private static async addMoreChildren(category: CategoryChannel, parents: VoiceChannel[]) {
+    const children = GrowingLobby.getChildren(category, parents);
     const isFull = GrowingLobby.isFull(...children);
 
     if (isFull) {
-      await GrowingLobby.newChild(category, children);
+      await GrowingLobby.newChild(category);
     }
   }
 
-  private async checkEmptyChildren(category: CategoryChannel) {
-    const children = await this.getChildren(category);
+  private static async checkEmptyChildren(category: CategoryChannel, parents: VoiceChannel[]) {
+    const children = GrowingLobby.getChildren(category, parents);
 
     for (const channel of children) {
       if (channel.members.size == 0)
@@ -81,21 +65,41 @@ export class GrowingLobby implements Preprocessor<VoiceState> {
     }
   }
 
-  private async getChildren(category: CategoryChannel): Promise<VoiceChannel[]> {
+  private static getChildren(category: CategoryChannel, parents: VoiceChannel[]): VoiceChannel[] {
     const result: VoiceChannel[] = [];
+    const parentIDs = [];
+    for (const parent of parents)
+      parentIDs.push(parent.id);
 
     for (const channel of category.children.values()) {
-      if (channel.type == 'voice' && !this.whitelist.includes(channel.id)) {
+      if (channel.type == 'voice' && !parentIDs.includes(channel.id)) {
         result.push(channel as VoiceChannel);
       }
     }
     return result;
   }
 
-  private static async newChild(category: CategoryChannel, children: VoiceChannel[]) {
-    const count = children.length;
+  private static getParents(bot: Bot, category: CategoryChannel): VoiceChannel[] {
+    const result: VoiceChannel[] = [];
+    const store = bot.store.tags;
+
+    for (const channel of category.children.values()) {
+      if (channel.type != 'voice')
+        continue;
+      const vc = channel as VoiceChannel;
+      const isParent = store.has(Flux.parents, vc.id);
+
+      if (isParent)
+        result.push(vc);
+    }
+
+    return result;
+  }
+
+  private static async newChild(category: CategoryChannel) {
+    const count = category.children.size;
     const channel = await category.guild.channels.create(
-      `Gaming ${count + 4}`,
+      `Gaming ${count + 1}`,
       { type: 'voice' }
     );
 
