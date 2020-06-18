@@ -10,7 +10,7 @@ export class Censorship {
    */
   public static hasNWord(context: string): boolean {
     const match = context.match(
-      /(n([i!1])gg?(er|a)?\s|ni(gg|bb|qq)ers|ni(bb?|qq?)(er|a)?\W|niU+1F171U+1F171?(er|a)?|n\s?([i1])\s?g\s?g\s?([e3])\s?r|n\s?i\s?g\s?g\s?a|niger(?!ia)|)/g
+      /(n\s{0,}([i!1])\s{0,}(g\s{0,}g?|b\s{0,}b?|q\s{0,}q?)\s{0,}(e\s{0,}r\s{0,}s?|a|n\s{0,}o\s{0,}g)\W|niU+1F171U+1F171?(er|a)?|(?<!(\w|\d))ni(q|b)e?\s?(?=\s)|(?<!(\w|\d)nige(?!ria))|(?<!(\w|\d))nig\s|nig(?!(\s|\w)))/g
     );
 
     if (!match)
