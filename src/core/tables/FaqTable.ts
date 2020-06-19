@@ -21,7 +21,7 @@ export class FaqTable extends Table {
 
   public remQuestion(guild: string, question: string) {
     const info = this.db.prepare(
-      `DELETE FROM ${this.tableName} WHERE guild_id=? AND question=?`
+      `DELETE FROM ${this.tableName} WHERE guild_id=? AND question=? COLLATE NOCASE`
     ).run(guild, question);
 
     return info.changes > 0;

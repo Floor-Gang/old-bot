@@ -23,12 +23,61 @@ export class FaQ implements Command {
       case 'list':
         await FaQ.list(bot, msg);
         break;
+      case 'get':
+        await FaQ.get(bot, msg, args);
+        break;
       case 'set':
         await FaQ.set(bot, msg);
         break;
+      case 'test':
+        await FaQ.test(bot, msg.channel as TextChannel);
+        break;
+      default:
+        await FaQ.help(bot, msg);
     }
   }
 
+  private static async test(bot: Bot, channel: TextChannel) {
+    await FaQ.sendAll(bot, channel);
+  }
+
+  private static async help(bot: Bot, msg: Message) {
+    const prefix = bot.getConfig().bot.prefix;
+    await msg.reply(
+      `FaQ Commands:\n` +
+      ` - ${prefix}faq add <question> NEWLINE <answer>\n` +
+      ` - ${prefix}faq remove <question>\n` +
+      ` - ${prefix}faq set #faq-channel\n` +
+      ` - ${prefix}faq get <question context> Find the answer to a given question\n` +
+      ` - ${prefix}faq list This will show all the embed FaQ`
+    )
+  }
+
+  private static async get(bot: Bot, msg: Message, args: string[]) {
+    if (!msg.guild) {
+      await msg.reply("Use this command in a guild.");
+      return;
+    }
+    const store = bot.store.faq;
+    const faqs = store.allQuestions(msg.guild.id);
+    // !faq, get, <question>
+    const lookingFor = args.splice(2).join(' ').toLowerCase();
+    let found: MessageEmbed | null = null;
+
+    for (const faq of faqs) {
+      let lowerQuestion = faq.question.toLowerCase();
+      if (lowerQuestion.includes(lookingFor)) {
+        found = FaQ.buildEmbed(faq.question, faq.answer);
+        break;
+      }
+    }
+
+    if (found)
+      await msg.reply({ embed: found });
+    else {
+      await msg.reply(`Couldn't find any questions including "${lookingFor}"`);
+    }
+  }
 
   private static async add(bot: Bot, msg: Message, args: string[]) {
     if (!msg.guild) {
@@ -51,7 +100,7 @@ export class FaQ implements Command {
       if (channel && channel.type == "text") {
         const embed = FaQ.buildEmbed(question, answer);
         const txt = channel as TextChannel;
-        store.addQuestion(msg.guild.id, question, answer);
+        store.addQuestion(msg.guild.id, question.trim(), answer);
 
         await txt.send({ embed });
       } else {
@@ -69,8 +118,7 @@ export class FaQ implements Command {
     }
     // args = [faq, command, question ... answer]
     const store = bot.store.faq;
-    const newLines = args.splice(2).join(' ').split('\n');
-    const question = newLines[0];
+    const question = args.splice(2).join(' ');
 
     const removed = store.remQuestion(msg.guild.id, question);
 
