@@ -15,10 +15,9 @@ export class Rules implements Command {
 
   @Roles.isAdmin()
   public async handle(bot: Bot, msg: Message): Promise<void> {
-    // args = [prefix, rules, command]
     const args = msg.content.split(' ');
 
-    switch (args[2]) {
+    switch (args[1]) {
       case 'set':
         await Rules.set(bot, msg);
         break;
@@ -104,7 +103,7 @@ export class Rules implements Command {
   private static async post(channel: TextChannel): Promise<void> {
     for (const rule of rules) {
       const embed = new MessageEmbed(rule);
-      await channel.send({ embed });
+      setTimeout(() => channel.send({embed}), 1000);
     }
   }
 }
@@ -188,6 +187,13 @@ const rules = [
         {
           "name": "16. The Staff have the final say in decisions enforced as per the rules",
           "value": "If you have any issues with the enforcement, contact an admin."
+        },
+        {
+          "name": "17. Spoiler Discussions",
+          "value": "Refrain from discussing spoilers about games, movies" +
+            " and other media. If discussing spoilers, appropriately use" +
+            " `||Spoiler||`. If in an image, check the **mark image as" +
+            " spoiler** before posting."
         }
       ]
     },

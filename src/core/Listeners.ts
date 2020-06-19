@@ -92,10 +92,8 @@ export class Listeners {
         i > -1 ? i - 1 : undefined
       );
 
-      console.log(`"${commandName}"`)
-
       const executed = await this.onCommand(commandName, msg);
-      if (!executed) {
+      if (!executed && msg.content.includes('help')) {
         const help = this.getHelp();
         await msg.reply(help);
       }
@@ -129,9 +127,10 @@ export class Listeners {
   private async onCommand(name: string, msg: Message): Promise<boolean> {
     for (const command of this.commands) {
       if (command.name == name) {
-        const id = uuid();
+        const id = uuid().split('-')[0];
+        const time = Date.now();
         console.log(
-          `[${id}] Command Executed\n` +
+          `[${id}] [${time}] Command Executed\n` +
           ` - User: ${msg.author.username}#${msg.author.discriminator}\n` +
           ` - Command: ${msg.content}`
         );
@@ -139,7 +138,7 @@ export class Listeners {
           await command.handle(this.bot, msg);
         } catch (err) {
           console.error(
-            `[${id}] Command Error\n` +
+            `[${id}] [${Date.now()}] Command Error\n` +
             ` - User: ${msg.author.username}#${msg.author.discriminator}\n` +
             ` - Command: ${msg.content}\n` +
             ` - Error:`, err

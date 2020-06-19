@@ -21,7 +21,7 @@ export class Config {
   constructor() {
     this.bot = {
       token: '',
-      prefix: '!pewds',
+      prefix: '.',
       admin_roles: []
     }
   }

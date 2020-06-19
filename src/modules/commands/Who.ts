@@ -56,9 +56,11 @@ export class Who implements Command {
     const channel = msg.channel as TextChannel;
 
     try {
-      await bot.send(channel, list);
+      const m = await bot.send(channel, '...');
+      await m.edit(list);
     } catch (err) {
-      await bot.send(channel, "The list is too big!");
+      await bot.send(channel,
+        "The list is too big!");
       throw err;
     }
   }

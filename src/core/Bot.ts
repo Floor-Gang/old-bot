@@ -1,6 +1,6 @@
 import {
   Client,
-  FileOptions,
+  FileOptions, Message,
   TextChannel, User
 } from "discord.js";
 import { Listeners } from "./Listeners";
@@ -42,18 +42,18 @@ export class Bot {
    * @param context The body of the message to send
    * @param reply [Optional] mention a given user
    */
-  public async send(channel: TextChannel, context: string, reply?: User) {
+  public async send(channel: TextChannel, context: string, reply?: User): Promise<Message> {
     if (context.length >= Bot.characterLimit) {
       const attachment: FileOptions = {
         name: 'message.txt',
         attachment: Buffer.from(context)
       };
-      await channel.send({
+      return channel.send({
         files: [attachment],
         reply
       });
     } else {
-      await channel.send(context, { reply });
+      return channel.send(context, { reply });
     }
   }
 
