@@ -1,6 +1,6 @@
 import { Command } from "../../core/models/Command";
 import { Bot } from "../../core/Bot";
-import { Message, MessageEmbed, TextChannel } from "discord.js";
+import { Guild, Message, MessageEmbed, TextChannel } from "discord.js";
 import { Roles } from "../../util/Roles";
 
 
@@ -121,11 +121,40 @@ export class FaQ implements Command {
     const question = args.splice(2).join(' ');
 
     const removed = store.remQuestion(msg.guild.id, question);
-
-    if (removed)
+    if (removed) {
       await msg.reply("Removed.");
-    else
+      await this.removeEmbed(bot, msg.guild, question);
+    } else
       await msg.reply("Failed to remove question. Did you type it properly?");
+  }
+
+  private static async removeEmbed(bot: Bot, guild: Guild, question: string) {
+    const client = bot.getClient();
+    const store = bot.store.channels;
+    const faqChannelID = store.getChannel(
+      guild.id,
+      FaQ.tag
+    );
+    const faqChannel = await client.channels.fetch(faqChannelID || '');
+
+    if (faqChannel && faqChannel.type == "text") {
+      const txt = faqChannel as TextChannel
+      const messages = await txt.messages.fetch({ limit: 100 });
+
+      for (const message of messages.values()) {
+        const embed = message.embeds[0];
+
+        if (embed && embed.title) {
+          const faqQ = embed.title.toLowerCase();
+          const q = question.toLowerCase();
+
+          if (faqQ == q) {
+            await message.delete();
+            break;
+          }
+        }
+      }
+    }
   }
 
   private static async set(bot: Bot, msg: Message) {
