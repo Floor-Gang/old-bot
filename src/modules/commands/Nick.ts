@@ -74,7 +74,7 @@ export class Nick implements Command {
 
       for (const char of illegalChars) {
         let i = illegalChars.indexOf(char);
-        if (i == illegalChars.length)
+        if (i == illegalChars.length - 1)
           response += `${char}.`;
         else
           response += `${char}, `;
