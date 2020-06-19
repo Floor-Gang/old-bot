@@ -13,7 +13,7 @@ export class Nick implements Command {
   public readonly name = "nick";
   public readonly description = "Nickname management";
   private static readonly regex = new RegExp(/^[\x00-\x7F]*$/);
-  private static readonly tag = "nick-channel";
+  private static readonly tag = "nick_channel";
 
   public async handle(bot: Bot, msg: Message) {
     // args = [prefix, nick, command]
