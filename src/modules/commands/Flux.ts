@@ -5,8 +5,8 @@ import { Roles } from "../../util/Roles";
 
 
 export class Flux implements Command {
-  public static readonly parents = 'flux-parent';
-  public static readonly category = 'flux';
+  public static readonly parents = 'flux_parent';
+  public static readonly category = 'flux_category';
   public readonly name = 'flux';
   public readonly description = 'Make a category resizable';
 
@@ -33,7 +33,7 @@ export class Flux implements Command {
 
   private static async create(bot: Bot, msg: Message, args: string[]) {
     const client = bot.getClient();
-    const store = bot.store.tags;
+    const store = bot.store.channels;
     const categoryID = args[3];
 
     if (!categoryID) {
@@ -44,7 +44,7 @@ export class Flux implements Command {
     const channel = await client.channels.fetch(categoryID);
     if (channel && channel.type == "category") {
       const category = channel as CategoryChannel;
-      const has = store.has(Flux.category, category.id);
+      const has = store.hasChannel(category, Flux.category);
 
       if (has) {
         await msg.reply("This channel is already set.");
@@ -59,14 +59,15 @@ export class Flux implements Command {
   }
 
   private static newFlux(bot: Bot, category: CategoryChannel): string {
-    const store = bot.store.tags;
+    const store = bot.store.channels;
     let result = `Added "${category.name}".\nDefault Channels:\n`
 
-    store.setID(Flux.category, category.id);
+    store.set(category, Flux.category);
+
     for (const channel of category.children.values()) {
       if (channel.type == 'voice') {
         const vc = channel as VoiceChannel;
-        store.setID(Flux.parents, vc.id);
+        store.set(vc, Flux.parents);
         result += ` - ${vc.name}\n`;
       }
     }
@@ -75,15 +76,15 @@ export class Flux implements Command {
   }
 
   private static removeFlux(bot: Bot, category: CategoryChannel): string {
-    const store = bot.store.tags;
+    const store = bot.store.channels;
     let result = `Removed "${category.name}".\\nDefault Channels:\n`;
 
 
-    store.remove(Flux.category, category.id);
+    store.remove(category, Flux.category);
     for (const channel of category.children.values()) {
       if (channel.type == 'voice') {
         const vc = channel as VoiceChannel;
-        store.remove(Flux.parents, vc.id);
+        store.remove(vc, Flux.parents);
         result += ` - ${vc.name}\n`;
       }
     }
@@ -123,9 +124,13 @@ export class Flux implements Command {
   }
 
   private static async list(bot: Bot, msg: Message) {
+    if (!msg.guild) {
+      await msg.reply("Use this command in a guild.");
+      return;
+    }
     const client = bot.getClient();
-    const store = bot.store.tags;
-    const channels = store.getAllIDs(Flux.category);
+    const store = bot.store.channels;
+    const channels = store.getGuild(msg.guild.id, Flux.category);
     let list = 'Fluctuating Channels:\n';
 
     if (!channels) {

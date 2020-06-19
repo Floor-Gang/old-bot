@@ -13,7 +13,7 @@ export class GrowingLobby implements Preprocessor<VoiceState> {
   public readonly name = "voiceStateUpdate";
 
   public async process(bot: Bot, obj: VoiceState[]): Promise<VoiceState | null> {
-    const store = bot.store.tags;
+    const store = bot.store.channels;
     const old = obj[0];
     const updated = obj[1];
     let channel: VoiceChannel | undefined;
@@ -29,7 +29,7 @@ export class GrowingLobby implements Preprocessor<VoiceState> {
     if (!category)
       return obj[1];
 
-    const isFluxCategory = store.has(Flux.category, category.id);
+    const isFluxCategory = store.hasChannel(category, Flux.category);
 
     if (!isFluxCategory)
       return obj[1];
@@ -81,13 +81,13 @@ export class GrowingLobby implements Preprocessor<VoiceState> {
 
   private static getParents(bot: Bot, category: CategoryChannel): VoiceChannel[] {
     const result: VoiceChannel[] = [];
-    const store = bot.store.tags;
+    const store = bot.store.channels;
 
     for (const channel of category.children.values()) {
       if (channel.type != 'voice')
         continue;
       const vc = channel as VoiceChannel;
-      const isParent = store.has(Flux.parents, vc.id);
+      const isParent = store.hasChannel(vc, Flux.parents);
 
       if (isParent)
         result.push(vc);

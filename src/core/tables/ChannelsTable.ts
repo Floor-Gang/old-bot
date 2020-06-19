@@ -10,17 +10,59 @@ export class ChannelsTable extends Table {
 
   public updateChannel(channel: GuildChannel, tag: string): boolean {
     const info = this.db.prepare(
-      `UPDATE ${this.tableName} SET guild_id=?, channel_id=?, tag=?` +
+      `UPDATE ${this.tableName} SET guild_id=?, channel_id=?` +
       ` WHERE tag=? AND guild_id=?`
-    ).run(channel.guild.id, channel.id, tag, tag, channel.guild.id);
+    ).run(channel.guild.id, channel.id, tag, channel.guild.id);
 
     return info.changes > 0;
+  }
+
+  public set(channel: GuildChannel, tag: string) {
+    try {
+      this.addChannel(channel, tag);
+    } catch (err) {
+      this.updateChannel(channel, tag);
+    }
+  }
+
+  public getAll(tag: string): string[] {
+    const result: string[] = [];
+    const rows = this.db.prepare(
+      `SELECT channel_id FROM ${this.tableName} WHERE tag=?`
+    ).all(tag);
+
+    for (const row of rows) {
+      result.push(row.channel_id);
+    }
+
+    return result;
+  }
+
+  public getGuild(guildID: string, tag: string): string[] {
+    const result: string[] = [];
+    const rows = this.db.prepare(
+      `SELECT channel_id FROM ${this.tableName} WHERE tag=? AND guild_id=?`
+    ).all(tag, guildID);
+
+    for (const row of rows) {
+      result.push(row.channel_id);
+    }
+
+    return result;
   }
 
   public addChannel(channel: GuildChannel, tag: string) {
     this.db.prepare(
       `INSERT INTO ${this.tableName} (guild_id, channel_id, tag) VALUES (?,?,?)`
     ).run(channel.guild.id, channel.id, tag);
+  }
+
+  public remove(channel: GuildChannel, tag: string) {
+    const info = this.db.prepare(
+      `DELETE FROM ${this.tableName} WHERE channel_id=? AND tag=?`
+    ).run(channel.id, tag);
+
+    return info.changes > 0;
   }
 
   public getChannel(guildID: string, tag: string): string | null {
@@ -45,7 +87,7 @@ export class ChannelsTable extends Table {
   private init() {
     this.db.prepare(
       `CREATE TABLE IF NOT EXISTS ${this.tableName} ` +
-      `(guild_id text NOT NULL, channel_id text NOT NULL, tag UNIQUE NOT NULL)`
+      `(guild_id text NOT NULL, channel_id text NOT NULL, tag NOT NULL)`
     ).run();
   }
 }
