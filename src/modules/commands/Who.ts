@@ -9,8 +9,7 @@ import { Roles } from "../../util/Roles";
  */
 export class Who implements Command {
   public readonly name = 'who';
-  public readonly description = 'For listen who has a certain role. For' +
-                                ' help execute this command.'
+  public readonly description = 'For listing who has a certain role(s)';
 
   @Roles.isAdmin()
   public async handle(bot: Bot, msg: Message): Promise<void> {
