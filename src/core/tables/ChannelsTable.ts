@@ -28,8 +28,6 @@ export class ChannelsTable extends Table {
       `SELECT channel_id FROM ${this.tableName} WHERE guild_id=? AND tag=?`
     ).get(guildID, tag);
 
-    console.log(row);
-
     if (!row)
       return null;
 

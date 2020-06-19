@@ -1,4 +1,9 @@
-import { Message, PartialMessage, VoiceState } from "discord.js";
+import {
+  Message,
+  MessageReaction,
+  PartialMessage, PartialUser, User,
+  VoiceState
+} from "discord.js";
 import { preprocessors } from "../modules/preprocessors";
 import { commands } from "../modules/commands";
 import { Bot } from "./Bot";
@@ -33,6 +38,7 @@ export class Listeners {
     client.on('message', this.onMessage.bind(this));
     client.on('messageUpdate', this.onMessageUpdate.bind(this));
     client.on('voiceStateUpdate', this.onVoiceStateUpdate.bind(this));
+    client.on('messageReactionAdd', this.onReaction.bind(this));
 
     // Client
     client.on('ready', this.onReady.bind(this));
@@ -63,6 +69,10 @@ export class Listeners {
    */
   private async onVoiceStateUpdate(old: VoiceState, updated: VoiceState) {
     await this.process<VoiceState>('voiceStateUpdate', old, updated);
+  }
+
+  private async onReaction(reaction: MessageReaction, user: User | PartialUser) {
+    await this.process<MessageReaction>('messageReactionAdd', reaction, user);
   }
 
   /**

@@ -52,4 +52,16 @@ export class Roles {
       return method;
     }
   }
+
+  public isAdminUtil(bot: Bot, msg: Message) {
+    if (bot && msg) {
+      if (!msg.member)
+        return false;
+      const config = bot.getConfig();
+      return Roles.hasRole(
+        msg.member.roles.cache.array(),
+        config.bot.admin_roles
+      );
+    }
+  }
 }
