@@ -14,12 +14,12 @@ export class Who implements Command {
   @Roles.isAdmin()
   public async handle(bot: Bot, msg: Message): Promise<void> {
     const args = msg.content.split(' ');
-    const roleNames = args.splice(3)
+    const roleNames = args.splice(2)
       .join(' ')
       .split(',')
       .map(x => x.trim());
 
-    switch (args[2]) {
+    switch (args[1]) {
       case "isn't":
         await Who.listRoles(bot, msg, false, roleNames);
         break;
@@ -27,10 +27,11 @@ export class Who implements Command {
         await Who.listRoles(bot, msg, true, roleNames);
         break;
       default:
+        const prefix = bot.getConfig().bot.prefix;
         await msg.reply(
           `Sub commands:\n` +
-          ` - isn't role name 1, role name 2\n` +
-          ` - is role name 1, role name 2`
+          ` - ${prefix}who isn't role name 1, role name 2\n` +
+          ` - ${prefix}is role name 1, role name 2`
         );
     }
   }

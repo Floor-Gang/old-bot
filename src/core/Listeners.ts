@@ -86,9 +86,13 @@ export class Listeners {
 
 
     if (msg.content.startsWith(this.prefix)) {
-      // args = ["<bot prefix>", "commandName" || undefined]
-      const args = msg.content.split(' ');
-      const commandName = args[1];
+      const i = message.content.indexOf(' ');
+      const commandName = message.content.substr(
+        this.prefix.length,
+        i > -1 ? i - 1 : undefined
+      );
+
+      console.log(`"${commandName}"`)
 
       const executed = await this.onCommand(commandName, msg);
       if (!executed) {
@@ -107,7 +111,7 @@ export class Listeners {
 
     let help = "**Available Commands**\n";
     for (const command of this.commands) {
-      help += ` **${this.prefix} ${command.name}** ${command.description || ''}\n`;
+      help += ` **${this.prefix}${command.name}** ${command.description || ''}\n`;
     }
 
     this.help = help;

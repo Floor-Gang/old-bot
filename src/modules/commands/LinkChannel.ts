@@ -12,9 +12,9 @@ export class LinkChannel implements Command {
     // args = [prefix, link, command, channel ID | voice ID, text ID | undefined]
     const args = msg.content.split(' ');
 
-    switch (args[2]) {
+    switch (args[1]) {
       case 'create':
-        const vc = args[3];
+        const vc = args[2];
         const txt = msg.mentions.channels.first();
 
         if (vc && txt)
@@ -23,7 +23,7 @@ export class LinkChannel implements Command {
           await LinkChannel.help(bot, msg);
         break;
       case 'remove':
-        const channelID = args[3];
+        const channelID = args[2];
         if (channelID)
           await LinkChannel.remove(bot, msg, channelID);
         else
@@ -76,9 +76,9 @@ export class LinkChannel implements Command {
     const prefix = bot.getConfig().bot.prefix;
     await msg.reply(
       `Channel Link Commands:\n` +
-      ` - ${prefix} link create <voice channel ID> <#text-channel>\n` +
-      ` - ${prefix} link remove <voice channel ID or text channel ID>\n` +
-      ` - ${prefix} link list`
+      ` - ${prefix}link create <voice channel ID> <#text-channel>\n` +
+      ` - ${prefix}link remove <voice channel ID or text channel ID>\n` +
+      ` - ${prefix}link list`
     )
   }
 

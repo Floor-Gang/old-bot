@@ -15,7 +15,7 @@ export class Flux implements Command {
     // args = [prefix, flux, command]
     const args = msg.content.split(' ');
 
-    switch (args[2]) {
+    switch (args[1]) {
       case 'create':
         await Flux.create(bot, msg, args);
         break;
@@ -34,7 +34,7 @@ export class Flux implements Command {
   private static async create(bot: Bot, msg: Message, args: string[]) {
     const client = bot.getClient();
     const store = bot.store.channels;
-    const categoryID = args[3];
+    const categoryID = args[2];
 
     if (!categoryID) {
       await Flux.help(bot, msg);
@@ -96,15 +96,15 @@ export class Flux implements Command {
     const prefix = bot.getConfig().bot.prefix;
     await msg.reply(
       `Flux Commands:\n` +
-      ` - ${prefix} flux create <category ID>\n` +
-      ` - ${prefix} flux remove <category ID>\n` +
-      ` - ${prefix} flux list`
+      ` - ${prefix}flux create <category ID>\n` +
+      ` - ${prefix}flux remove <category ID>\n` +
+      ` - ${prefix}flux list`
     );
   }
 
   private static async remove(bot: Bot, msg: Message, args: string[]) {
     const client = bot.getClient();
-    const categoryID = args[3];
+    const categoryID = args[2];
 
     if (!categoryID) {
       await Flux.help(bot, msg);

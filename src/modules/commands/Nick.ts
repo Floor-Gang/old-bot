@@ -16,10 +16,9 @@ export class Nick implements Command {
   private static readonly tag = "nick_channel";
 
   public async handle(bot: Bot, msg: Message) {
-    // args = [prefix, nick, command]
     const args = msg.content.split(' ');
 
-    switch (args[2]) {
+    switch (args[1]) {
       case 'set':
         await Nick.set(bot, msg);
         break;
@@ -65,7 +64,7 @@ export class Nick implements Command {
     }
 
     const store = bot.store.nicks;
-    const name = args.splice(3).join(' ');
+    const name = args.splice(2).join(' ');
     const illegalChars = Nick.getIllegal(name);
 
     // Check if they provided a valid nickname
@@ -124,8 +123,8 @@ export class Nick implements Command {
     const prefix = bot.getConfig().bot.prefix;
     await msg.reply(
       `Nickname Management Commands:\n` +
-      ` - ${prefix} nick request <nickname> Request a new nickname\n` +
-      ` - ${prefix} nick set #channel-name Set the channel where requests appear`
+      ` - ${prefix}nick request <nickname> Request a new nickname\n` +
+      ` - ${prefix}nick set #channel-name Set the channel where requests appear`
     )
   }
 

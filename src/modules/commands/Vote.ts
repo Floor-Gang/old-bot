@@ -13,7 +13,7 @@ export class Vote implements Command {
     // args = [prefix, votes, command]
     const args = msg.content.split(' ');
 
-    if (args[2] == 'create') {
+    if (args[1] == 'create') {
       await Vote.create(msg, args);
     } else {
       await Vote.help(bot, msg);

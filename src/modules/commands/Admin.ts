@@ -19,16 +19,16 @@ export class Admin implements Command {
     if (!msg.member)
       return;
 
-    // args = ["<bot prefix>", "admin", "command"]
+    // args = ["<bot prefix>admin", "command"]
     const args = msg.content.split(' ');
-    const roleNames = args.splice(3)
+    const roleNames = args.splice(2)
       .join(' ')
       .split(',')
       .map(x => x.trim());
     const roles = Roles.getRoles(msg.guild as Guild, roleNames);
 
 
-    switch (args[2]) {
+    switch (args[1]) {
       case 'add':
         await Admin.add(bot, msg, roles);
         break;
@@ -96,9 +96,9 @@ export class Admin implements Command {
 
     await msg.reply(
       'Admin Commands\n' +
-      ` - ${prefix} admin add Role a, role b, role c\n` +
-      ` - ${prefix} admin remove Role a, role b, role c\n` +
-      ` - ${prefix} admin list`
+      ` - ${prefix}admin add Role a, role b, role c\n` +
+      ` - ${prefix}admin remove Role a, role b, role c\n` +
+      ` - ${prefix}admin list`
     );
   }
 }

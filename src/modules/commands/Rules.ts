@@ -53,13 +53,8 @@ export class Rules implements Command {
       return;
     }
 
-    try {
-      store.addChannel(channel, Rules.tag);
-      await msg.reply("Set rules channel.");
-    } catch (err) {
-      store.updateChannel(channel, Rules.tag);
-      await msg.reply("Set rules channel.");
-    }
+    store.set(channel, Rules.tag);
+    await msg.reply("Rules channel set.");
   }
 
   private static async update(bot: Bot, msg: Message): Promise<void> {
@@ -99,9 +94,9 @@ export class Rules implements Command {
     const prefix = bot.getConfig().bot.prefix;
     await msg.reply(
       `Rules Commands\n` +
-      ` - ${prefix} rules update This will update the rules channel\n` +
-      ` - ${prefix} rules set #channel-name This will set the rules channel\n` +
-      ` - ${prefix} rules test This will display the rules in this channel`
+      ` - ${prefix}rules update This will update the rules channel\n` +
+      ` - ${prefix}rules set #channel-name This will set the rules channel\n` +
+      ` - ${prefix}rules test This will display the rules in this channel`
     );
   }
 
