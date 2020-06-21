@@ -6,7 +6,6 @@ import { Rules } from "./Rules";
 import { Vote } from "./Vote";
 import { LinkChannel } from "./LinkChannel";
 import { Flux } from "./Flux";
-import { Nick } from "./Nick";
 import { FaQ } from "./FaQ";
 
 /**
@@ -20,6 +19,5 @@ export const commands: Command[] = [
   new Vote(),
   new LinkChannel(),
   new Flux(),
-  new Nick(),
   new FaQ()
 ];

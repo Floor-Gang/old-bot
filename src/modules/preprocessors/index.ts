@@ -2,7 +2,6 @@ import { Messages } from "./Messages";
 import { Suggestions } from "./Suggestions";
 import { ChannelLink } from "./ChannelLink";
 import { GrowingLobby } from "./GrowingLobby";
-import { NickDecision } from "./NickDecision";
 
 
 /**
@@ -13,5 +12,4 @@ export const preprocessors = [
   new Suggestions(),
   new ChannelLink(),
   new GrowingLobby(),
-  new NickDecision()
 ];
