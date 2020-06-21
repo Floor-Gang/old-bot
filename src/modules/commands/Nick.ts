@@ -65,6 +65,12 @@ export class Nick implements Command {
 
     const store = bot.store.nicks;
     const name = args.splice(2).join(' ');
+    // Make sure their nickname is below 32 characters
+    if (name.length >= 32) {
+      await msg.reply("Your nickname must be below 32 characters.");
+      return;
+    }
+
     const illegalChars = Nick.getIllegal(name);
 
     // Check if they provided a valid nickname
