@@ -6,7 +6,9 @@ import fs from 'fs';
 export type BotConfig = {
   token: string;
   prefix: string;
-  admin_roles: string[]
+  admin_roles: string[];
+  roles_can_mention: string[];
+  mention_ch: string;
 }
 
 
@@ -22,7 +24,16 @@ export class Config {
     this.bot = {
       token: '',
       prefix: '.',
-      admin_roles: []
+      admin_roles: [],
+      roles_can_mention: ['718453895550074930', 
+                          '718453523057999952', 
+                          '718524998234669108', 
+                          '718525193718464512', 
+                          '718816943452323880', 
+                          '722864056284872784', 
+                          '718523160898830377', 
+                          '718938884565762168'],
+      mention_ch: '721477749440643112'
     }
   }
 
