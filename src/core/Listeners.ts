@@ -2,7 +2,9 @@ import {
   Message,
   MessageReaction,
   PartialMessage, PartialUser, User,
-  VoiceState
+  VoiceState,
+  MessageEmbed,
+  TextChannel
 } from "discord.js";
 import { preprocessors } from "../modules/preprocessors";
 import { commands } from "../modules/commands";
@@ -84,6 +86,29 @@ export class Listeners {
     if (msg == null)
       return;
 
+    if (msg.content.match(/(dylan\s?|\s?dev\s?(elopers?|)\s?|floor(\s?|\W)(g?a?n?g?\s?bot))/g) && 
+    msg.member?.roles.cache.find(r => r.name in ["Admin", "Discord Mod", "Developer", "Senior Developer", "Sive", "PewDiePie"]) ) {
+      const client = this.bot.getClient();
+      const mention_ch = client.channels.cache.get("721477749440643112") as TextChannel;
+
+      let message_url = `https://discordapp.com/channels/${msg.guild?.id}/${msg.channel.id}/${msg.id}`;
+      
+      const embed = new MessageEmbed()
+        .setTitle(`${msg.author} said`)
+        .setColor(0xff0000)
+        .addFields(
+          { name: "Server:", value: msg.guild?.name, inline: true },
+          { name: "Channel:", value: msg.channel.fetch, inline: true },
+          { name: "Author:", value: msg.author, inline: true },
+          { name: "Time (UTC):", value: msg.createdAt, inline: true },
+          { name: "Message Link:", value: message_url },
+          { name: "Message:", value: message.cleanContent, inline: false }
+        )
+        .setTimestamp();
+
+      mention_ch.send(embed);
+
+    }
 
     if (msg.content.startsWith(this.prefix)) {
       const i = message.content.indexOf(' ');
