@@ -23,24 +23,24 @@ export class Messages implements Preprocessor<Message> {
      * Detects conversation between mods about the floorgang bot.
      * Mentions this in the developer server.
      */
-    if (msg.content.match(/(dylan\s?|\s?dev\s?(elopers?|)\s?|floor(\s?|\W)(g?a?n?g?\s?bot))/g) && 
-    msg.member?.roles.cache.find(r => r.id in bot.getConfig().bot.roles_can_mention) ) {
+    if (msg.content.match(/(dylan\s?\W|\s?dev\s?(elopers?|elopment|)\s?\W|floor(\s?|\W)(g?a?n?g?\s?bot))/g) && 
+    msg.member?.roles.cache.find(r => bot.getConfig().bot.roles_can_mention.includes(r.id)) ) {
       const client = bot.getClient();
       const mention_ch = client.channels.cache.get(bot.getConfig().bot.mention_ch) as TextChannel;
 
       let message_url = `https://discordapp.com/channels/${msg.guild?.id}/${msg.channel.id}/${msg.id}`;
       
       const embed = new MessageEmbed()
-        .setTitle(`${msg.author} said`)
         .setColor(0xff0000)
         .addFields(
           { name: "Server:", value: msg.guild?.name, inline: true },
-          { name: "Channel:", value: msg.channel.fetch, inline: true },
+          { name: "Channel:", value: `<#${msg.channel.id}>`, inline: true },
           { name: "Author:", value: msg.author, inline: true },
           { name: "Time (UTC):", value: msg.createdAt, inline: true },
           { name: "Message Link:", value: message_url },
           { name: "Message:", value: msg.cleanContent, inline: false }
         )
+        .setAuthor(`${msg.author.username} said`)
         .setTimestamp();
 
       mention_ch.send(embed);
