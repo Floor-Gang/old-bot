@@ -124,9 +124,8 @@ const rules = [
           "value": "Do not ping Pewdiepie or Sive."
         },
         {
-          "name": "2. Usernames",
-          "value": "Make sure you have an appropriate username, no" +
-            " nicknames with unusual or unreadable Unicode."
+          "name": "2. Nickname/Usernames",
+          "value": "No use of special font or typographical emphasis."
         },
         {
           "name": "3. NSFW/NSFL",
