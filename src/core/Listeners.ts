@@ -84,7 +84,6 @@ export class Listeners {
     if (msg == null)
       return;
 
-
     if (msg.content.startsWith(this.prefix)) {
       const i = message.content.indexOf(' ');
       const commandName = message.content.substr(
