@@ -6,7 +6,6 @@ import { Rules } from "./Rules";
 import { Vote } from "./Vote";
 import { LinkChannel } from "./LinkChannel";
 import { Flux } from "./Flux";
-import { FaQ } from "./FaQ";
 
 /**
  * When a new Command class is created it must be appended to this array.
@@ -19,5 +18,4 @@ export const commands: Command[] = [
   new Vote(),
   new LinkChannel(),
   new Flux(),
-  new FaQ()
 ];
