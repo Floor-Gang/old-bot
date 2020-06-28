@@ -1,5 +1,4 @@
 import { Messages } from "./Messages";
-import { Suggestions } from "./Suggestions";
 import { ChannelLink } from "./ChannelLink";
 import { GrowingLobby } from "./GrowingLobby";
 
@@ -9,7 +8,6 @@ import { GrowingLobby } from "./GrowingLobby";
  */
 export const preprocessors = [
   new Messages(),
-  new Suggestions(),
   new ChannelLink(),
   new GrowingLobby(),
 ];
