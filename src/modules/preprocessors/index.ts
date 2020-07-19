@@ -1,5 +1,4 @@
 import { Messages } from "./Messages";
-import { ChannelLink } from "./ChannelLink";
 import { GrowingLobby } from "./GrowingLobby";
 
 
@@ -8,6 +7,5 @@ import { GrowingLobby } from "./GrowingLobby";
  */
 export const preprocessors = [
   new Messages(),
-  new ChannelLink(),
   new GrowingLobby(),
 ];

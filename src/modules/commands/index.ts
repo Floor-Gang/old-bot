@@ -3,7 +3,6 @@ import type { Command } from "../../core/models/Command";
 import { Who } from "./Who";
 import { Admin } from "./Admin";
 import { Rules } from "./Rules";
-import { LinkChannel } from "./LinkChannel";
 import { Flux } from "./Flux";
 
 /**
@@ -14,6 +13,5 @@ export const commands: Command[] = [
   new Ping(),
   new Who(),
   new Rules(),
-  new LinkChannel(),
   new Flux(),
 ];
